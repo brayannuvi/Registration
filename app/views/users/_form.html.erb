@@ -1,0 +1,167 @@
+<% if flash[:notice] %>
+    <div id="notice" class="alert alert-success">
+        <%= flash[:notice] %>
+    </div>
+<% end %>
+
+<% if @user.errors.any? %>
+    <ul>
+        <% @user.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+        <% end %>
+    </ul>
+<% end %>
+
+<%= form_with model: @user do |form| %>
+    <div>
+        <%= form.select :gender, options_for_select(['Femenino', 'Masculino']), prompt: 'Sexo *', required: true %>
+    </div>
+
+    <div>
+      <%= form.date_field :birthdate, required: true %>
+    </div>
+    
+    <div>
+      <%= form.text_field :name, placeholder: 'Nombre *', required: true %>
+    </div>
+
+    <div>
+        <%= form.text_field :last_name, placeholder: 'Apellido *', required: true %>
+    </div>
+    
+    <div>
+        <%= form.text_field :email, placeholder: 'Email *', required: true %>
+    </div>
+    
+    <div>
+        <%= form.text_field :address, placeholder: 'Dirección *', required: true %>
+    </div>
+
+    <div>
+        <%= form.text_field :type_of_housing, placeholder: 'Casa / apartamento', required: true %>
+    </div>
+
+    <div>
+        <%= form.collection_select :country_id, Country.all, :id, :name %>
+    </div>
+
+    <% if @user.new_record? %>
+        <div>
+            <%= form.select :department_id, options_for_select([]), prompt: 'Departamento *' %>
+        </div>
+
+        <div>
+            <%= form.select :city_id, options_for_select([]), prompt: 'Ciudad *', required: true%>
+        </div>
+    <% else %>
+        <div>
+            <%= form.collection_select :department_id, Department.where(country_id: @user.country_id), :id, :name %>
+        </div>
+
+        <div>
+            <%= form.collection_select :city_id, City.where(department_id: @user.department_id), :id, :name, required: true%>
+        </div>
+    <% end %>
+
+
+    <div>
+        <%= form.text_area :extra_information, placeholder: 'Departamento *' %>
+    </div>
+
+    <%= form.hidden_field :campo_oculto, value: @token %>
+
+    <div>
+        <%= form.submit (@user.new_record? ? 'Crear usuario' : 'Actualizar usuario')%>
+        <%= link_to 'Ver usuarios', users_path %>
+    </div>
+<% end %>
+
+<script>
+
+var csrf = document.getElementById('user_campo_oculto').value;
+var selectCountry = document.getElementById('user_country_id');
+var baseOption = document.createElement("option");
+baseOption.value = "";
+baseOption.disabled = true;
+baseOption.hidden = true;
+if(<%= @user.new_record? %>){
+    baseOption.selected = true;
+}else{
+
+}
+
+baseOption.text = 'País *';
+selectCountry.add(baseOption);
+var selectDepartment = document.getElementById('user_department_id');
+var selectCity = document.getElementById('user_city_id');
+
+selectCountry.addEventListener('change', function(){
+  selectDepartment.innerHTML = '';
+  selectCity.innerHTML = '';
+  var selectedCountry = {country_id: selectCountry.value }; 
+
+  fetch('../../countries/country_departments', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': csrf
+      },
+      body: JSON.stringify(selectedCountry)
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error en la solicitud');
+        }
+        return response.json();
+      })
+      .then(data => {
+        data.forEach(function(department) {
+          var optionDepartment = document.createElement("option");
+          optionDepartment.text = department.name;
+          optionDepartment.value = department.id;
+          selectDepartment.add(optionDepartment);
+        });
+        baseOption.selected = true;
+        baseOption.text = 'Departamento *';
+        selectDepartment.add(baseOption);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  })
+
+  selectDepartment.addEventListener('change', function(){
+  selectCity.innerHTML = '';
+  baseOption.text = 'Ciudad *';
+  selectCity.add(baseOption);
+  var selectedDepartment = {department_id: selectDepartment.value }; 
+
+  fetch('../../departments/departments_cities', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': csrf
+      },
+      body: JSON.stringify(selectedDepartment)
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error en la solicitud');
+        }
+        return response.json();
+      })
+      .then(data => {
+        data.forEach(function(city) {
+          var optionCity = document.createElement("option");
+          optionCity.text = city.name;
+          optionCity.value = city.id;
+          selectCity.add(optionCity);
+        });
+
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  })
+
+</script>

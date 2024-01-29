@@ -1,0 +1,64 @@
+<table>
+<th>Nombre</th>
+<th>Apellido</th>
+<th>Fecha de nacimiento</th>
+<th>Genero</th>
+<th>Email</th>
+<th>Dirección</th>
+<th>Tipo de vivienda</th>
+<th>Pais</th>
+<th>Departamento</th>
+<th>Ciudad</th>
+<th>Departamento</th>
+<% actual_city = '' %>
+<% @users.each do |user| %>
+    <% if actual_city != user.city_name %>
+        <tr><td>Usuarios de <%= user.city_name%></td></tr>
+    <% end %>
+    <tr>
+        <td><%= user.name %></td>
+        <td><%= user.last_name %></td>
+        <td><%= user.birthdate %></td>
+        <td><%= user.gender %></td>
+        <td><%= user.email %></td>
+        <td><%= user.address %></td>
+        <td><%= user.type_of_housing %></td>
+        <td><%= user.country_name %></td>
+        <td><%= user.department_name %></td>
+        <td><%= user.city_name %></td>
+        <td><%= user.extra_information %></td>
+        <td><%= link_to 'Editar', edit_user_path(user.id) %></td>
+        <td><%= link_to "Eliminar", user, data: { turbo_method: :delete, turbo_confirm: "¿Estás seguro de que deseas eliminar este usuario?" } %></td>
+    </tr>
+    <% actual_city = user.city_name %>
+<% end %>
+<button onclick="get_users()">Exportar listado JSON</button>
+
+<textarea rows="20" cols="200" id='json_data', style ='display: none;'></textarea>
+
+<%= link_to 'Crear usuario', new_user_path %>
+
+<script>
+
+
+function get_users() {
+    var textElement = document.getElementById('json_data');
+    textElement.style.display = 'block';
+      fetch('users/get_all_users')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error en la solicitud');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Datos obtenidos:', data);
+        textElement.value = JSON.stringify(data);
+      })
+      .catch(error => {
+        console.error('Error en la solicitud:', error);
+      });
+  }
+
+
+</script>
