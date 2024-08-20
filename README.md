@@ -1,24 +1,41 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+# Registration
 
-Things you may want to cover:
+## Requisitos
 
-* Ruby version
+- Ruby (versión 3.2.2)
+- Rails (versión 7.1.3)
+- wkhtmltopdf 0.12.6
 
-* System dependencies
+## Configuración
 
-* Configuration
+1. Dirígete a la ubicacion donde quieres clonar el proyecto por medio de CMD.
 
-* Database creation
+2. Clona el repositorio:
 
-* Database initialization
+Ejecuta: git clone git@github.com:brayannuvi/Registration.git
 
-* How to run the test suite
+3. En el caso de usar un sistema operativo windows instalar wkhtmltopdf por medio de la pagina oficial https://wkhtmltopdf.org/downloads.html, en caso de usar otro sistema operativo sera necesario la inclusion de la gema gem 'wkhtmltopdf-binary' en el archivo Gemfile
 
-* Services (job queues, cache servers, search engines, etc.)
+4. Dirígete a la carpeta del proyecto que acabas de clonar por medio de CMD.
 
-* Deployment instructions
+5. Instala las dependencias:
 
-* ...
+Ejecuta: bundle install
+
+6. Luego en la ruta app/config/initializers/wicked_pdf.rb estableceras la ruta de acceso a wkhtmltopdf.exe en el campo exe_path:
+
+7. Configura la base de datos desde la ruta principal del proyecto:
+
+Ejecuta: rails db:migrate
+
+8. Brinda permisos de Control total a la ruta que lleva al proyecto que clonaste.
+
+## Uso
+
+1. Dirígete a la carpeta del proyecto por medio de CMD.
+
+2. Ejecuta: rails server
+
+3. Abre tu navegador y ve a http://localhost:3000.
