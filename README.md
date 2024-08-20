@@ -24,13 +24,15 @@ Ejecuta: git clone git@github.com:brayannuvi/Registration.git
 
 Ejecuta: bundle install
 
-6. Luego en la ruta app/config/initializers/wicked_pdf.rb estableceras la ruta de acceso a wkhtmltopdf.exe en el campo exe_path:
+6. Luego en la ruta config/initializers/wicked_pdf.rb estableceras la ruta de acceso a wkhtmltopdf.exe en el campo exe_path:
 
 7. Configura la base de datos desde la ruta principal del proyecto:
 
 Ejecuta: rails db:migrate
 
 8. Brinda permisos de Control total a la ruta que lleva al proyecto que clonaste.
+
+9. En la ruta config/database.yml en la configuracion de la base de datos default establece los parametros de coneccion a tu base de datos mysql
 
 ## Uso
 
