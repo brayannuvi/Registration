@@ -66,7 +66,10 @@ group :test do
   gem "selenium-webdriver"
 end
 
-#creation of pdf
+# Creation of pdf
 gem 'wicked_pdf', '~> 2.7'
 
-gem 'wkhtmltopdf-binary'
+# Styling
+gem 'bootstrap'
+gem 'sassc-rails'
+gem 'jquery-rails'

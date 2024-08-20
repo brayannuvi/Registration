@@ -12,10 +12,13 @@ Rails.application.routes.draw do
 
   get 'users/generate_pdf'
 
-  resources :users
+  resources :users do
+    collection do
+      get :export_pdf # Ruta para exportar todos los registros como PDF
+    end
+  end
 
   post '/countries/country_departments', to: 'countries#country_departments'
   post '/departments/departments_cities', to: 'departments#departments_cities'
-
 
 end

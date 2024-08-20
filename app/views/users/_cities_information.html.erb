@@ -1,0 +1,41 @@
+<table class="table table-striped table-borderless">
+<th>Nombre</th>
+<th>Apellido</th>
+<th>Fecha de nacimiento</th>
+<th>Genero</th>
+<th>Email</th>
+<th>Dirección</th>
+<th>Tipo de vivienda</th>
+<th>Pais</th>
+<th>Departamento</th>
+<th>Ciudad</th>
+<th>Nota</th>
+<% unless @context == 'pdf' %>
+    <th></th>
+    <th></th>
+<% end %>    
+<% actual_city = '' %>
+<% @users.each do |user| %>
+    <% if actual_city != user.city_name %>
+        <tr><td><strong>Usuarios de <%= user.city_name%></strong></td></tr>
+    <% end %>
+    <tr>
+        <td><%= user.name %></td>
+        <td><%= user.last_name %></td>
+        <td><%= user.birthdate %></td>
+        <td><%= user.gender %></td>
+        <td><%= user.email %></td>
+        <td><%= user.address %></td>
+        <td><%= user.type_of_housing %></td>
+        <td><%= user.country_name %></td>
+        <td><%= user.department_name %></td>
+        <td><%= user.city_name %></td>
+        <td><%= user.extra_information %></td>
+        <% unless @context == 'pdf' %>
+            <td><%= link_to 'Editar', edit_user_path(user.id) %></td>
+            <td><%= link_to "Eliminar", user, data: { turbo_method: :delete, turbo_confirm: "¿Estás seguro de que deseas eliminar este usuario?" } %></td>
+        <% end %>
+    </tr>
+    <% actual_city = user.city_name %>
+<% end %>
+</table>
