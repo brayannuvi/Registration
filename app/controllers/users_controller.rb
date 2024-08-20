@@ -1,7 +1,36 @@
 class UsersController < ApplicationController
 
 def index
-    @users = User.joins(city: {department: :country}).select('users.*, cities.name as city_name, departments.name as department_name, countries.name as country_name').order(city_id: :asc)
+    @users = User.cities
+end
+
+
+def export_pdf
+  @users = User.cities
+
+  @context = 'pdf'
+  
+  respond_to do |format|
+    format.html # Para la vista HTML normal
+    format.pdf do
+      # Generar el PDF con WickedPDF
+      pdf = WickedPdf.new.pdf_from_string(
+        render_to_string(
+          template: 'users/pdf',
+              users: 'export_pdf',
+              formats: [:html]
+        ),
+        orientation: 'Portrait'
+      )
+
+      # Enviar el archivo PDF para descarga
+      send_data pdf,
+                filename: "cities_report_#{DateTime.now}.pdf",
+                type: 'application/pdf',
+                disposition: 'attachment'
+    end
+  end
+
 end
 
 def new
@@ -22,14 +51,15 @@ def create
 end
 
 def edit
-    @user = User.joins(city: {department: :country}).select('users.*, cities.id as city_id, departments.id as department_id, countries.id as country_id').where(id: params[:id]).last
+    @user = User.specific_city(params[:id])
     @token = form_authenticity_token
 end
 
 def update
-    @user = User.find(params[:id])
+    @user = User.specific_city(params[:id])
 
     if @user.update(user_params)
+      flash[:notice] = 'Usuario actualizado exitosamente.'
       redirect_to @user
     else
       render :edit, status: :unprocessable_entity
@@ -40,11 +70,11 @@ def destroy
     @user = User.find(params[:id])
     @user.destroy
 
-    redirect_to root_path, status: :see_other
+    redirect_to users_path, status: :see_other
 end
 
 def get_all_users
-    render json: User.all
+    render json: User.cities
 end
 
 def generate_pdf

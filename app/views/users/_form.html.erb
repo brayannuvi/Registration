@@ -11,68 +11,51 @@
         <% end %>
     </ul>
 <% end %>
-
 <%= form_with model: @user do |form| %>
-    <div>
-        <%= form.select :gender, options_for_select(['Femenino', 'Masculino']), prompt: 'Sexo *', required: true %>
-    </div>
-
-    <div>
-      <%= form.date_field :birthdate, required: true %>
+    <div class="row">
+      <%= form.select :gender, options_for_select(['Femenino', 'Masculino']), { prompt: 'Sexo *', required: true }, class: 'col form-control m-1'%>
+      <%= form.date_field :birthdate, required: true, class: 'col form-control m-1' %>
     </div>
     
-    <div>
-      <%= form.text_field :name, placeholder: 'Nombre *', required: true %>
-    </div>
-
-    <div>
-        <%= form.text_field :last_name, placeholder: 'Apellido *', required: true %>
+    <div class="row">
+      <%= form.text_field :name, class: 'form-control col m-1', placeholder: 'Nombre *', required: true %>
+      <%= form.text_field :last_name, class: 'form-control col m-1', placeholder: 'Apellido *', required: true %>
     </div>
     
-    <div>
-        <%= form.text_field :email, placeholder: 'Email *', required: true %>
+    <div class="row p-1">
+        <%= form.text_field :email, class: 'form-control', type: 'email', placeholder: 'Email *', required: true %>
     </div>
     
-    <div>
-        <%= form.text_field :address, placeholder: 'Dirección *', required: true %>
+    <div class="row p-1">
+        <%= form.text_field :address, class: 'form-control', placeholder: 'Dirección *', required: true %>
     </div>
 
-    <div>
-        <%= form.text_field :type_of_housing, placeholder: 'Casa / apartamento', required: true %>
-    </div>
-
-    <div>
-        <%= form.collection_select :country_id, Country.all, :id, :name %>
+    <div class="row">
+        <%= form.text_field :type_of_housing, class: 'form-control col m-1', placeholder: 'Casa / apartamento', required: true %>
+        <%= form.collection_select :country_id, Country.all, :id, :name, {}, class: 'form-control col m-1' %>
     </div>
 
     <% if @user.new_record? %>
-        <div>
-            <%= form.select :department_id, options_for_select([]), prompt: 'Departamento *' %>
-        </div>
-
-        <div>
-            <%= form.select :city_id, options_for_select([]), prompt: 'Ciudad *', required: true%>
+        <div class="row">
+            <%= form.select :department_id, options_for_select([]), { prompt: 'Departamento *', required: true }, class: 'form-select col m-1'%>
+            <%= form.select :city_id, options_for_select([]), { prompt: 'Ciudad *', required: true }, class: 'form-select col m-1'%>
         </div>
     <% else %>
-        <div>
-            <%= form.collection_select :department_id, Department.where(country_id: @user.country_id), :id, :name %>
-        </div>
-
-        <div>
-            <%= form.collection_select :city_id, City.where(department_id: @user.department_id), :id, :name, required: true%>
+        <div class="row">
+            <%= form.collection_select :department_id, Department.where(country_id: @user.country_id), :id, :name, { required: true, prompt: 'Departamento *' }, class: 'form-control col m-1' %>
+            <%= form.collection_select :city_id, City.where(department_id: @user.department_id), :id, :name, { required: true, prompt: 'Ciudad *' }, class: 'form-control col m-1' %>
         </div>
     <% end %>
 
 
-    <div>
-        <%= form.text_area :extra_information, placeholder: 'Departamento *' %>
+    <div class="row p-1">
+        <%= form.text_area :extra_information, class: 'form-control', placeholder: 'Nota *', required: true%>
     </div>
 
     <%= form.hidden_field :campo_oculto, value: @token %>
 
-    <div>
-        <%= form.submit (@user.new_record? ? 'Crear usuario' : 'Actualizar usuario')%>
-        <%= link_to 'Ver usuarios', users_path %>
+    <div class="d-flex justify-content-end">
+        <%= form.submit (@user.new_record? ? 'Crear usuario' : 'Actualizar usuario'), class: 'btn btn-success'%>
     </div>
 <% end %>
 
@@ -86,8 +69,6 @@ baseOption.disabled = true;
 baseOption.hidden = true;
 if(<%= @user.new_record? %>){
     baseOption.selected = true;
-}else{
-
 }
 
 baseOption.text = 'País *';
@@ -108,26 +89,27 @@ selectCountry.addEventListener('change', function(){
       },
       body: JSON.stringify(selectedCountry)
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Error en la solicitud');
-        }
-        return response.json();
-      })
-      .then(data => {
-        data.forEach(function(department) {
-          var optionDepartment = document.createElement("option");
-          optionDepartment.text = department.name;
-          optionDepartment.value = department.id;
-          selectDepartment.add(optionDepartment);
-        });
-        baseOption.selected = true;
-        baseOption.text = 'Departamento *';
-        selectDepartment.add(baseOption);
-      })
-      .catch(error => {
-        console.error('Error:', error);
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error en la solicitud');
+      }
+      return response.json();
+    })
+    .then(data => {
+      data.forEach(function(department) {
+        var optionDepartment = document.createElement("option");
+        optionDepartment.text = department.name;
+        optionDepartment.value = department.id;
+        selectDepartment.add(optionDepartment);
       });
+      baseOption.text = 'Departamento *';
+      selectDepartment.add(baseOption);
+      var event = new Event('change', { bubbles: true });
+      selectDepartment.dispatchEvent(event);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
   })
 
   selectDepartment.addEventListener('change', function(){
@@ -144,24 +126,26 @@ selectCountry.addEventListener('change', function(){
       },
       body: JSON.stringify(selectedDepartment)
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Error en la solicitud');
-        }
-        return response.json();
-      })
-      .then(data => {
-        data.forEach(function(city) {
-          var optionCity = document.createElement("option");
-          optionCity.text = city.name;
-          optionCity.value = city.id;
-          selectCity.add(optionCity);
-        });
-
-      })
-      .catch(error => {
-        console.error('Error:', error);
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error en la solicitud');
+      }
+      return response.json();
+    })
+    .then(data => {
+      data.forEach(function(city) {
+        var optionCity = document.createElement("option");
+        optionCity.text = city.name;
+        optionCity.value = city.id;
+        selectCity.add(optionCity);
       });
-  })
+
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  });
+  
+  
 
 </script>
